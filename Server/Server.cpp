@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "resource.h"
 #include "Server_i.h"
-#include "opccomn_i.c"
 
 using namespace ATL;
 
