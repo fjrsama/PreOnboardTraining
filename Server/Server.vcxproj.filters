@@ -57,6 +57,9 @@
     <ClInclude Include="OPCGroup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ATLCPImplMT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Server.rc">

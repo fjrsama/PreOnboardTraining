@@ -1,7 +1,7 @@
 // OPCGroup.h : Declaration of the COPCGroup
 
-#ifndef OPCGroup_H
-#define OPCGroup_H
+#pragma once
+
 #include "resource.h"       // main symbols
 
 
@@ -35,7 +35,7 @@ class COPCGroup;
 void t1(COPCGroup*);
 
 class ATL_NO_VTABLE COPCGroup :
-	public CComObjectRootEx<CComSingleThreadModel>,
+	public CComObjectRootEx<CComMultiThreadModel>,
 	public IDispatchImpl<IOPCItemMgt, &__uuidof(IOPCItemMgt)>,
 	public IConnectionPointContainerImpl<COPCGroup>,
 	public CProxyIOPCDataCallback<COPCGroup>
@@ -196,5 +196,3 @@ void t1(COPCGroup *pGroup)
 	}
 	CoUninitialize();
 }
-
-#endif

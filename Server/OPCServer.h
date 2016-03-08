@@ -1,7 +1,7 @@
 // OPCServer.h : Declaration of the COPCServer
 
-#ifndef _OPCServer_H
-#define _OPCServer_H
+#pragma once
+
 #include "OPCGroup.h"
 
 #include "resource.h"       // main symbols
@@ -17,16 +17,16 @@
 #include <iostream>
 
 
-#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
-#error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
-#endif
+//#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
+//#error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
+//#endif
 
 using namespace ATL;
 
 // COPCServer
 
 class ATL_NO_VTABLE COPCServer :
-	public CComObjectRootEx<CComSingleThreadModel>,
+	public CComObjectRootEx<CComMultiThreadModel>,
 	public CComCoClass<COPCServer, &CLSID_OPCServer>,
 	public IDispatchImpl<IOPCServer, &IID_IOPCServer, &LIBID_ServerLib, 1, 0>,
 	public IConnectionPointContainerImpl<COPCServer>,
@@ -87,6 +87,7 @@ public:
 			wstring CurrName;
 			strm >> CurrName;
 			pCurrGroup = &m_Groups[CurrName];
+			pCurrGroup->_AtlInitialConstruct();
 			pCurrGroup->_AtlInitialConstruct();
 		}
 		else if (m_Groups.find(szName) == m_Groups.end())
@@ -149,4 +150,3 @@ public:
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(OPCServer), COPCServer)
-#endif
