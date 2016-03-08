@@ -4,7 +4,7 @@
 #define OPCGroup_H
 #include "resource.h"       // main symbols
 
-// change
+//changed machine
 
 #include "Server_i.h"
 #include "IOPCDataCallback_CP.H"
@@ -163,7 +163,7 @@ public:
 		return E_NOTIMPL;
 	}
 
-	 
+
 	void Fire_OnDataChange()
 	{
 		CProxyIOPCDataCallback::Fire_OnDataChange(0, hClientGroup, S_OK, S_OK, m_OPCItems.size(), hClientItems, vValues, wQualities, ftTimeStamps, Errors);
