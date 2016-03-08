@@ -4,7 +4,7 @@
 #define OPCGroup_H
 #include "resource.h"       // main symbols
 
-
+//changed machine
 
 #include "Server_i.h"
 #include "IOPCDataCallback_CP.H"
