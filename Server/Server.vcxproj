@@ -235,6 +235,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ATLCPImplMT.h" />
     <ClInclude Include="IOPCDataCallback_CP.H" />
     <ClInclude Include="OPCGroup.h" />
     <ClInclude Include="OPCServer.h" />
