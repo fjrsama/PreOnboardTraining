@@ -1,0 +1,51 @@
+// ATLTest.idl : IDL source for ATLTest
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ATLTest.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(58CDB2B1-7E68-4543-9460-771F54044806),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface ITest : IDispatch{
+	[id(1)] HRESULT Hello();
+};
+[
+	object,
+	uuid(35F26B04-1D3E-46A4-852C-3C49599CFEAE),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface ITestClass1 : IDispatch{
+};
+[
+	uuid(C6227143-BDCC-462F-B6DE-03893D130F14),
+	version(1.0),
+]
+library ATLTestLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(49D2D919-3464-4DC5-ABFB-72C3D8763C0F)		
+	]
+	coclass Test
+	{
+		[default] interface ITest;
+	};
+	[
+		uuid(268632A9-B97F-4827-A5CC-13ECB352BB7F)		
+	]
+	coclass TestClass1
+	{
+		[default] interface ITestClass1;
+	};
+};
+
