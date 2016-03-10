@@ -88,7 +88,6 @@ public:
 			strm >> CurrName;
 			pCurrGroup = &m_Groups[CurrName];
 			pCurrGroup->_AtlInitialConstruct();
-			pCurrGroup->_AtlInitialConstruct();
 		}
 		else if (m_Groups.find(szName) == m_Groups.end())
 		{

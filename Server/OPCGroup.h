@@ -169,6 +169,15 @@ public:
 		CProxyIOPCDataCallback::Fire_OnDataChange(0, hClientGroup, S_OK, S_OK, m_OPCItems.size(), hClientItems, vValues, wQualities, ftTimeStamps, Errors);
 	}
 
+
+	STDMETHODIMP Advise(
+		_Inout_ IUnknown* pUnkSink,
+		_Out_ DWORD* pdwCookie)
+	{
+		HRESULT hr = IConnectionPointImpl::Advise(pUnkSink, pdwCookie);
+		return hr;
+	}
+
 	BEGIN_CONNECTION_POINT_MAP(COPCGroup)
 		CONNECTION_POINT_ENTRY(__uuidof(IOPCDataCallback))
 	END_CONNECTION_POINT_MAP()
@@ -182,6 +191,8 @@ void t1(COPCGroup *pGroup)
 	int i = 5;
 	while (1)
 	{
+		pGroup->Lock();
+		if (pGroup->m_OPCItems.size() <= 0) continue;
 		Sleep(200);
 		auto iter = pGroup->m_OPCItems.begin();
 		for (size_t i = 0; i <pGroup->m_OPCItems.size(); ++i)
@@ -192,7 +203,9 @@ void t1(COPCGroup *pGroup)
 			++iter;
 		}
 		//MessageBox(0,L"123",0,0);
+		
 		pGroup->Fire_OnDataChange();
+		pGroup->Unlock();
 	}
 	CoUninitialize();
 }
