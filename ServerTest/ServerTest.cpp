@@ -26,7 +26,7 @@ int main()
 		DWORD UpdateRate;
 
 		IOPCItemMgt *tmpOPCItemMgt;
-		pOPCServer->AddGroup(L"Group1", TRUE, 200, 1, &TimeBias, &DeadBand, 0, &phServerGroup, &UpdateRate,IID_IOPCItemMgt, (LPUNKNOWN*)&tmpOPCItemMgt);
+		HRESULT hr=pOPCServer->AddGroup(L"Group1", TRUE, 200, 1, &TimeBias, &DeadBand, 0, &phServerGroup, &UpdateRate,IID_IOPCItemMgt, (LPUNKNOWN*)&tmpOPCItemMgt);
 		CComPtr<IOPCItemMgt> pOPCItemMgt = tmpOPCItemMgt;
 		
 		DWORD dwCookie;
@@ -45,7 +45,7 @@ int main()
 		IConnectionPointContainer *pCPC = NULL;
 
 
-		HRESULT hr = pOPCItemMgt->QueryInterface(IID_IConnectionPointContainer, (void **)&pCPC);
+		hr = pOPCItemMgt->QueryInterface(IID_IConnectionPointContainer, (void **)&pCPC);
 
 
 		if (pCPC != NULL)

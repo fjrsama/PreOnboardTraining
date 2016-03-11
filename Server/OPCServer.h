@@ -75,11 +75,11 @@ public:
 public:
 	STDMETHOD(AddGroup)(LPCWSTR szName, BOOL bActive, DWORD dwRequestedUpdateRate, OPCHANDLE hClientGroup, LONG * pTimeBias, FLOAT * pPercentDeadband, DWORD dwLCID, OPCHANDLE * phServerGroup, DWORD * pRevisedUpdateRate, REFIID riid, LPUNKNOWN * ppUnk)
 	{
+		
 		using namespace std;
 		static wstring DefaultName = L"Group";
 		static int DefaultNameCnt = 1;
 		CComObject<COPCGroup> *pCurrGroup=NULL;
-
 		if (szName == NULL || szName == wstring(L""))
 		{
 			wstringstream strm;
@@ -88,11 +88,13 @@ public:
 			strm >> CurrName;
 			pCurrGroup = &m_Groups[CurrName];
 			pCurrGroup->_AtlInitialConstruct();
+
 		}
 		else if (m_Groups.find(szName) == m_Groups.end())
 		{
 			pCurrGroup = &m_Groups[szName];
 			pCurrGroup->hClientGroup = hClientGroup;
+			pCurrGroup->_AtlInitialConstruct();
 			
 		}
 		else 

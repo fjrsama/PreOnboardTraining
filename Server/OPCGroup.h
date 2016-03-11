@@ -15,9 +15,11 @@
 #include <sstream>
 #include <thread>
 #include <memory>
-#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
-#error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
-#endif
+
+
+//#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
+//#error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
+//#endif
 
 using namespace ATL;
 
@@ -42,7 +44,7 @@ class ATL_NO_VTABLE COPCGroup :
 	
 {
 public:
-	COPCGroup():_thread(t1,this)
+	COPCGroup()//:_thread(t1,this)
 	{
 		for (int i = 0; i < 100; ++i)
 		{
@@ -55,11 +57,11 @@ public:
 			ftTimeStamps[i].dwLowDateTime = 0;
 			Errors[i] = 0;
 		}
-		_thread.detach();
+	//	_thread.detach();
 	}
 	~COPCGroup()
 	{
-		_thread.join();
+		//_thread.join();
 	}
 
 
@@ -191,9 +193,9 @@ void t1(COPCGroup *pGroup)
 	int i = 5;
 	while (1)
 	{
-		pGroup->Lock();
 		if (pGroup->m_OPCItems.size() <= 0) continue;
 		Sleep(200);
+		pGroup->Lock();
 		auto iter = pGroup->m_OPCItems.begin();
 		for (size_t i = 0; i <pGroup->m_OPCItems.size(); ++i)
 		{
