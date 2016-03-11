@@ -21,7 +21,7 @@ int HandleDistributor::GetNewHandle()
 BOOL HandleDistributor::ReleaseHandle(int handle)
 {
 	if (
-		handle < 0 ||
+		handle < 1 ||
 		handle > this->max ||
 		vacancies.find(handle) != vacancies.end()
 		)

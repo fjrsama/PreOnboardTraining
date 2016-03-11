@@ -21,6 +21,7 @@ HRESULT DataCallbackSink::QueryInterface(REFIID riid, void  **ppvObject)
 		*ppvObject = static_cast<IUnknown*>(this);
 		AddRef();
 	}
+
 	else if (riid == IID_IOPCDataCallback)
 	{
 		*ppvObject = static_cast<IOPCDataCallback*>(this);
@@ -64,7 +65,7 @@ HRESULT __stdcall DataCallbackSink::OnDataChange(
 	/* [size_is][in] */ FILETIME *pftTimeStamps,
 	/* [size_is][in] */ HRESULT *pErrors)
 {
-	MessageBox(0,L"123",0,0);
+	cout << "111" << endl;
 	return S_OK;
 }
 

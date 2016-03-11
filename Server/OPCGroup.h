@@ -44,7 +44,7 @@ class ATL_NO_VTABLE COPCGroup :
 	
 {
 public:
-	COPCGroup()//:_thread(t1,this)
+	COPCGroup():_thread(t1,this)
 	{
 		for (int i = 0; i < 100; ++i)
 		{
@@ -57,11 +57,11 @@ public:
 			ftTimeStamps[i].dwLowDateTime = 0;
 			Errors[i] = 0;
 		}
-	//	_thread.detach();
+		_thread.detach();
 	}
 	~COPCGroup()
 	{
-		//_thread.join();
+		_thread.join();
 	}
 
 
@@ -87,6 +87,7 @@ public:
 
 public:
 	HandleDistributor m_HandleDistributor;
+	HandleDistributor m_MarshallCookieDistributor;
 	static const std::set<std::wstring> ItemMap;
 	std::list<OPCItem> m_OPCItems;
 	OPCHANDLE hClientGroup;
@@ -99,6 +100,7 @@ public:
 	HRESULT Errors[100];
 	IStream *pStm = NULL;
 	std::thread _thread;
+	
 	// IOPCItemMgt Methods
 public:
 	STDMETHOD(AddItems)(DWORD dwCount, OPCITEMDEF * pItemArray, OPCITEMRESULT ** ppAddResults, HRESULT ** ppErrors)
@@ -117,8 +119,7 @@ public:
 			tmpItem.Data.vt = item.vtRequestedDataType;
 			tmpItem.hServer = m_HandleDistributor.GetNewHandle();
 			tmpItem.ItemID = item.szItemID;
-			tmpItem.hClient = item.hClient;
-			
+			tmpItem.hClient = item.hClient;			
 			m_OPCItems.push_back(tmpItem);			
 		});
 		/*auto iter = m_OPCItems.begin();
@@ -130,7 +131,8 @@ public:
 			++iter;
 		}*/
 
-		
+		Fire_OnDataChange();
+		Fire_OnDataChange();
 		//Fire_OnDataChange(0, hClientGroup, S_OK, S_OK, m_OPCItems.size(), hClientItems, vValues, wQualities, ftTimeStamps, Errors);
 		return S_OK;
 	}
@@ -176,8 +178,60 @@ public:
 		_Inout_ IUnknown* pUnkSink,
 		_Out_ DWORD* pdwCookie)
 	{
-		HRESULT hr = IConnectionPointImpl::Advise(pUnkSink, pdwCookie);
-		return hr;
+		//HRESULT hr = IConnectionPointImpl::Advise(pUnkSink, pdwCookie);
+		//return hr;
+		IUnknown* p = NULL;
+		HRESULT hRes = S_OK;
+		if (pdwCookie != NULL)
+			*pdwCookie = 0;
+		if (pUnkSink == NULL || pdwCookie == NULL)
+			return E_POINTER;
+		IID iid;
+		GetConnectionInterface(&iid);
+		hRes = pUnkSink->QueryInterface(iid, (void**)&p);
+		if (SUCCEEDED(hRes))
+		{
+			Lock();
+			IStream *pStream = NULL;
+			CoMarshalInterThreadInterfaceInStream(iid, p, &pStream);
+			if (pStream)
+			{
+				*pdwCookie = m_MarshallCookieDistributor.GetNewHandle();
+				m_MarshallMap[*pdwCookie] = pStream;
+			}
+			hRes = (*pdwCookie != NULL) ? S_OK : CONNECT_E_ADVISELIMIT;
+			Unlock();
+
+			if (hRes != S_OK)
+				p->Release();
+		}
+		else if (hRes == E_NOINTERFACE)
+			hRes = CONNECT_E_CANNOTCONNECT;
+		if (FAILED(hRes))
+			*pdwCookie = 0;
+		return hRes;
+
+	}
+
+	STDMETHODIMP Unadvise(_In_ DWORD dwCookie)
+	{
+		HRESULT hRes = S_OK;
+		IID iid;
+		GetConnectionInterface(&iid);
+		Lock();
+		IUnknown* p = NULL;
+		LPSTREAM pStream = m_MarshallMap[dwCookie];
+		if (pStream!=NULL)
+		{
+			CoGetInterfaceAndReleaseStream(pStream, iid, (void**)&p);
+			m_MarshallMap.erase(dwCookie);
+			m_MarshallCookieDistributor.ReleaseHandle(dwCookie);
+			HRESULT hRes = p == NULL ? CONNECT_E_NOCONNECTION : S_OK;
+		}
+		Unlock();
+		if (hRes == S_OK && p != NULL)
+			p->Release();
+		return hRes;
 	}
 
 	BEGIN_CONNECTION_POINT_MAP(COPCGroup)
@@ -189,8 +243,7 @@ const std::set<std::wstring> COPCGroup::ItemMap = { L"ItemY1",L"ItemY2",L"ItemY3
 
 void t1(COPCGroup *pGroup)
 {
-	CoInitialize(NULL);
-	int i = 5;
+	
 	while (1)
 	{
 		if (pGroup->m_OPCItems.size() <= 0) continue;
@@ -205,9 +258,8 @@ void t1(COPCGroup *pGroup)
 			++iter;
 		}
 		//MessageBox(0,L"123",0,0);
-		
 		pGroup->Fire_OnDataChange();
 		pGroup->Unlock();
 	}
-	CoUninitialize();
+
 }

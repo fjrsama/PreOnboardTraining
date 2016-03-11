@@ -36,7 +36,7 @@ int main()
 		_Module.Init(NULL, GetModuleHandle(NULL));
 		
 
-		DataCallbackSink *pSink = new DataCallbackSink;
+		
 
 
 		IConnectionPoint *pCP = NULL;
@@ -53,9 +53,10 @@ int main()
 			hr = pCPC->FindConnectionPoint(IID_IOPCDataCallback, &pCP);
 			pCPC->Release();
 		}
-
+		DataCallbackSink *pSink = new DataCallbackSink;
 		if (pCP != NULL)
 		{
+			
 			hr = pCP->Advise(pSink, &dwCookie);
 		}
 		OPCITEMDEF OPCItem = {
@@ -71,7 +72,7 @@ int main()
 		OPCITEMRESULT *OPCItemResult;
 		HRESULT *ErrorResult;
 		pOPCItemMgt->AddItems(1, &OPCItem, &OPCItemResult, &ErrorResult);
-		while (1);
+		while(1)Sleep(50);
 		pCP->Unadvise(dwCookie);
 		delete pSink;
 		_Module.Term();

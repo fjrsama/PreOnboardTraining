@@ -34,7 +34,7 @@ extern "C" const GUID ;
 class HandleDistributor
 {
 private:
-	int max = -1;
+	int max = 0;
 	std::set<int> vacancies;
 public:
 	int GetNewHandle();

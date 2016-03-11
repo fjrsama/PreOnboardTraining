@@ -10,30 +10,44 @@ template<class T>
 class CProxyIOPCDataCallback :
 	public ATL::IConnectionPointImpl<T, &__uuidof(IOPCDataCallback)>
 {
+protected:
+	std::map<DWORD, IStream*> m_MarshallMap;
 public:
+
 	HRESULT Fire_OnDataChange(DWORD dwTransid, OPCHANDLE hGroup, HRESULT hrMasterquality, HRESULT hrMastererror, DWORD dwCount, OPCHANDLE * phClientItems, VARIANT * pvValues, WORD * pwQualities, FILETIME * pftTimeStamps, HRESULT * pErrors)
 	{
 		HRESULT hr = S_OK;
 		T * pThis = static_cast<T *>(this);
-		int cConnections = m_vec.GetSize();
+		CoInitialize(NULL);
+		int cConnections = m_MarshallMap.size();
 
-		for (int iConnection = 0; iConnection < cConnections; iConnection++)
+		for (auto iter = m_MarshallMap.begin(); iter != m_MarshallMap.end();++iter)
 		{
+
+			IID iid;
+			GetConnectionInterface(&iid);
+			CComPtr<IUnknown> punkConnection;
 			pThis->Lock();
-			CComPtr<IUnknown> punkConnection = m_vec.GetAt(iConnection);
+			//CComPtr<IUnknown> punkConnection = m_vec.GetAt(iConnection);
+			LPSTREAM pStream = iter->second;
 			pThis->Unlock();
-
-			IOPCDataCallback * pConnection= static_cast<IOPCDataCallback *>(punkConnection.p);
-			//hr = punkConnection->QueryInterface(IID_IOPCDataCallback, (void**)&pConnection);
-			
-
-
-			if (pConnection)
+			if (pStream)
 			{
-				
-				hr = pConnection->OnDataChange(dwTransid, hGroup, hrMasterquality, hrMastererror, dwCount, phClientItems, pvValues, pwQualities, pftTimeStamps, pErrors);
+				IUnknown *pUnk = NULL;
+				CoGetInterfaceAndReleaseStream(pStream, iid, (void**)&pUnk);
+				IOPCDataCallback * pConnection; //= static_cast<IOPCDataCallback *>(punkConnection.p);
+				pUnk->QueryInterface(iid, (void**)&pConnection);
+				if (pConnection)
+				{
+
+					hr = pConnection->OnDataChange(dwTransid, hGroup, hrMasterquality, hrMastererror, dwCount, phClientItems, pvValues, pwQualities, pftTimeStamps, pErrors);
+					pStream = NULL;
+					CoMarshalInterThreadInterfaceInStream(iid, pUnk, &pStream);
+					iter->second = pStream;
+				}
 			}
 		}
+		CoUninitialize();
 		return hr;
 	}
 	HRESULT Fire_OnReadComplete(DWORD dwTransid, OPCHANDLE hGroup, HRESULT hrMasterquality, HRESULT hrMastererror, DWORD dwCount, OPCHANDLE * phClientItems, VARIANT * pvValues, WORD * pwQualities, FILETIME * pftTimeStamps, HRESULT * pErrors)
