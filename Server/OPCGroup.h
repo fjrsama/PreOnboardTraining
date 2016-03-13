@@ -44,7 +44,7 @@ class ATL_NO_VTABLE COPCGroup :
 	
 {
 public:
-	COPCGroup():_thread(t1,this)
+	COPCGroup() :_thread(std::mem_fun(&COPCGroup::t1), this)
 	{
 		for (int i = 0; i < 100; ++i)
 		{
@@ -57,7 +57,6 @@ public:
 			ftTimeStamps[i].dwLowDateTime = 0;
 			Errors[i] = 0;
 		}
-		_thread.detach();
 	}
 	~COPCGroup()
 	{
@@ -82,7 +81,7 @@ public:
 
 	void FinalRelease()
 	{
-		
+
 	}
 
 public:
@@ -100,6 +99,7 @@ public:
 	HRESULT Errors[100];
 	IStream *pStm = NULL;
 	std::thread _thread;
+	std::map<DWORD, IStream*> m_MarshallMap;
 	
 	// IOPCItemMgt Methods
 public:
@@ -117,23 +117,12 @@ public:
 			}
 			OPCItem tmpItem;
 			tmpItem.Data.vt = item.vtRequestedDataType;
+			tmpItem.Data.dblVal = 0.1;
 			tmpItem.hServer = m_HandleDistributor.GetNewHandle();
 			tmpItem.ItemID = item.szItemID;
 			tmpItem.hClient = item.hClient;			
 			m_OPCItems.push_back(tmpItem);			
 		});
-		/*auto iter = m_OPCItems.begin();
-		for (size_t i = 0; i <m_OPCItems.size(); ++i)
-		{
-			hClientItems[i] = iter->hClient;
-			vValues[i] = iter->Data;
-			Errors[i] = S_OK;
-			++iter;
-		}*/
-
-		Fire_OnDataChange();
-		Fire_OnDataChange();
-		//Fire_OnDataChange(0, hClientGroup, S_OK, S_OK, m_OPCItems.size(), hClientItems, vValues, wQualities, ftTimeStamps, Errors);
 		return S_OK;
 	}
 	STDMETHOD(ValidateItems)(DWORD dwCount, OPCITEMDEF * pItemArray, BOOL bBlobUpdate, OPCITEMRESULT ** ppValidationResults, HRESULT ** ppErrors)
@@ -226,12 +215,35 @@ public:
 			CoGetInterfaceAndReleaseStream(pStream, iid, (void**)&p);
 			m_MarshallMap.erase(dwCookie);
 			m_MarshallCookieDistributor.ReleaseHandle(dwCookie);
-			HRESULT hRes = p == NULL ? CONNECT_E_NOCONNECTION : S_OK;
+			hRes = p == NULL ? CONNECT_E_NOCONNECTION : S_OK;
 		}
 		Unlock();
 		if (hRes == S_OK && p != NULL)
 			p->Release();
 		return hRes;
+	}
+
+	void t1()
+	{
+		CoInitializeEx(NULL, COINIT_MULTITHREADED);
+		while (m_dwRef>=0)
+		{
+			if (m_OPCItems.size() <= 0) continue;
+			Sleep(200);
+			if (m_OPCItems.size() <= 0) continue;
+			Lock();
+			auto iter = m_OPCItems.begin();
+			for (size_t i = 0; i <m_OPCItems.size(); ++i)
+			{
+				hClientItems[i] = iter->hClient;
+				vValues[i] = iter->Data;
+				Errors[i] = S_OK;
+				++iter;
+			}
+			Fire_OnDataChange();
+			Unlock();
+		}
+		CoUninitialize();
 	}
 
 	BEGIN_CONNECTION_POINT_MAP(COPCGroup)
@@ -241,25 +253,27 @@ public:
 const std::set<std::wstring> COPCGroup::ItemMap = { L"ItemY1",L"ItemY2",L"ItemY3" };
 //OBJECT_ENTRY_AUTO(__uuidof(OPCGroup), COPCGroup)
 
-void t1(COPCGroup *pGroup)
-{
-	
-	while (1)
-	{
-		if (pGroup->m_OPCItems.size() <= 0) continue;
-		Sleep(200);
-		pGroup->Lock();
-		auto iter = pGroup->m_OPCItems.begin();
-		for (size_t i = 0; i <pGroup->m_OPCItems.size(); ++i)
-		{
-			pGroup->hClientItems[i] = iter->hClient;
-			pGroup->vValues[i] = iter->Data;
-			pGroup->Errors[i] = S_OK;
-			++iter;
-		}
-		//MessageBox(0,L"123",0,0);
-		pGroup->Fire_OnDataChange();
-		pGroup->Unlock();
-	}
-
-}
+//void t1(COPCGroup *pGroup)
+//{
+//	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+//	while (pGroup->m_dwRef > 0)
+//	{
+//		if (pGroup->m_OPCItems.size() <= 0) continue;
+//		Sleep(200);
+//		if (pGroup->m_OPCItems.size() <= 0) continue;
+//		
+//		pGroup->Lock();
+//		auto iter = pGroup->m_OPCItems.begin();
+//		for (size_t i = 0; i <pGroup->m_OPCItems.size(); ++i)
+//		{
+//			pGroup->hClientItems[i] = iter->hClient;
+//			pGroup->vValues[i] = iter->Data;
+//			pGroup->Errors[i] = S_OK;
+//			++iter;
+//		}
+//		pGroup->Fire_OnDataChange();
+//		pGroup->Unlock();
+//	}
+//	MessageBox(NULL, 0, L"end", 0);
+//	CoUninitialize();
+//}

@@ -10,18 +10,17 @@ template<class T>
 class CProxyIOPCDataCallback :
 	public ATL::IConnectionPointImpl<T, &__uuidof(IOPCDataCallback)>
 {
-protected:
-	std::map<DWORD, IStream*> m_MarshallMap;
+	
 public:
 
 	HRESULT Fire_OnDataChange(DWORD dwTransid, OPCHANDLE hGroup, HRESULT hrMasterquality, HRESULT hrMastererror, DWORD dwCount, OPCHANDLE * phClientItems, VARIANT * pvValues, WORD * pwQualities, FILETIME * pftTimeStamps, HRESULT * pErrors)
 	{
 		HRESULT hr = S_OK;
 		T * pThis = static_cast<T *>(this);
-		CoInitialize(NULL);
-		int cConnections = m_MarshallMap.size();
+		
+		int cConnections = pThis->m_MarshallMap.size();
 
-		for (auto iter = m_MarshallMap.begin(); iter != m_MarshallMap.end();++iter)
+		for (auto iter = pThis->m_MarshallMap.begin(); iter != pThis->m_MarshallMap.end();++iter)
 		{
 
 			IID iid;
@@ -47,7 +46,7 @@ public:
 				}
 			}
 		}
-		CoUninitialize();
+
 		return hr;
 	}
 	HRESULT Fire_OnReadComplete(DWORD dwTransid, OPCHANDLE hGroup, HRESULT hrMasterquality, HRESULT hrMastererror, DWORD dwCount, OPCHANDLE * phClientItems, VARIANT * pvValues, WORD * pwQualities, FILETIME * pftTimeStamps, HRESULT * pErrors)

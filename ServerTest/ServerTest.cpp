@@ -13,9 +13,10 @@ using namespace std;
 
 int main()
 {
-	CoInitialize(NULL);
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	//CComModule _Module;
 
-
+	//_Module.Init(NULL, GetModuleHandle(NULL));
 	CComPtr<IOPCServer> pOPCServer;
 	pOPCServer.CoCreateInstance(CLSID_OPCServer);
 	if (pOPCServer != NULL)
@@ -28,12 +29,9 @@ int main()
 		IOPCItemMgt *tmpOPCItemMgt;
 		HRESULT hr=pOPCServer->AddGroup(L"Group1", TRUE, 200, 1, &TimeBias, &DeadBand, 0, &phServerGroup, &UpdateRate,IID_IOPCItemMgt, (LPUNKNOWN*)&tmpOPCItemMgt);
 		CComPtr<IOPCItemMgt> pOPCItemMgt = tmpOPCItemMgt;
-		
 		DWORD dwCookie;
 
-		CComModule _Module;
 		
-		_Module.Init(NULL, GetModuleHandle(NULL));
 		
 
 		
@@ -72,15 +70,17 @@ int main()
 		OPCITEMRESULT *OPCItemResult;
 		HRESULT *ErrorResult;
 		pOPCItemMgt->AddItems(1, &OPCItem, &OPCItemResult, &ErrorResult);
-		while(1)Sleep(50);
+		getchar();
+		
 		pCP->Unadvise(dwCookie);
-		delete pSink;
-		_Module.Term();
+		pCP->Release();
+		cout << "end" << endl;
 	}
 	else
 	{
 		std::cout << "failed to connect to the OPC server";
 	}
+	//_Module.Term();
     return 0;
 }
 

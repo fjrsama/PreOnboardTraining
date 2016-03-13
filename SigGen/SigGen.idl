@@ -1,0 +1,40 @@
+// SigGen.idl : SigGen的 IDL 源
+//
+
+// 此文件将由 MIDL 工具处理以
+// 产生类型库(SigGen.tlb)和封送处理代码。
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(0C497937-7AAB-46A9-AFCC-1C736B084D46),
+	pointer_default(unique)
+]
+interface ISignal : IUnknown 
+{
+	HRESULT GetCurrentValue(
+		[in] LPWSTR szSigID,
+		[out] VARIANT* pvtData
+		);
+};
+[
+	uuid(0BECD760-41A2-4E79-978D-D2CB3917D6BC),
+	version(1.0),
+]
+library SigGenLib
+{
+
+	interface ISignal;
+
+	importlib("stdole2.tlb");
+	[
+		uuid(4DEB5A58-EBBC-4E9D-8562-EBA94BC40637)		
+	]
+	coclass Signal
+	{
+		[default] interface ISignal;
+	};
+};
+

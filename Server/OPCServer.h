@@ -65,7 +65,7 @@ public:
 	}
 
 private:
-	std::map<std::wstring, CComObject<COPCGroup>> m_Groups;
+	std::map<std::wstring, CComObjectNoLock<COPCGroup>> m_Groups;
 public:
 
 
@@ -79,7 +79,7 @@ public:
 		using namespace std;
 		static wstring DefaultName = L"Group";
 		static int DefaultNameCnt = 1;
-		CComObject<COPCGroup> *pCurrGroup=NULL;
+		CComObjectNoLock<COPCGroup> *pCurrGroup=NULL;
 		if (szName == NULL || szName == wstring(L""))
 		{
 			wstringstream strm;
@@ -87,11 +87,13 @@ public:
 			wstring CurrName;
 			strm >> CurrName;
 			pCurrGroup = &m_Groups[CurrName];
+			pCurrGroup->hClientGroup = hClientGroup;
 			pCurrGroup->_AtlInitialConstruct();
 
 		}
 		else if (m_Groups.find(szName) == m_Groups.end())
 		{
+			//CreateInstance(&m_Groups[szName]);
 			pCurrGroup = &m_Groups[szName];
 			pCurrGroup->hClientGroup = hClientGroup;
 			pCurrGroup->_AtlInitialConstruct();

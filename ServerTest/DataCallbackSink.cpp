@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DataCallbackSink.h"
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 
@@ -65,7 +66,14 @@ HRESULT __stdcall DataCallbackSink::OnDataChange(
 	/* [size_is][in] */ FILETIME *pftTimeStamps,
 	/* [size_is][in] */ HRESULT *pErrors)
 {
-	cout << "111" << endl;
+	for_each(pvValues, pvValues + dwCount, [&](VARIANT & v)
+	{
+		if (v.vt == VT_R8)
+		{
+			cout << v.dblVal << "  ,  ";
+		}
+	});
+	cout << endl;
 	return S_OK;
 }
 
