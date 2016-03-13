@@ -10,8 +10,8 @@
 #include "IOPCDataCallback_CP.H"
 #include "opcerror.h"
 #include "stdafx.h"
-
-
+#include "..\SigGen\SigGen_i.h"
+#include "..\SigGen\SigGen_i.c"
 #include <sstream>
 #include <thread>
 #include <memory>
@@ -226,6 +226,10 @@ public:
 	void t1()
 	{
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
+		CComPtr<ISignal> pSignal;
+		pSignal.CoCreateInstance(CLSID_Signal);
+
+
 		while (m_dwRef>=0)
 		{
 			if (m_OPCItems.size() <= 0) continue;
@@ -235,6 +239,7 @@ public:
 			auto iter = m_OPCItems.begin();
 			for (size_t i = 0; i <m_OPCItems.size(); ++i)
 			{
+				pSignal->GetCurrentValue(iter->ItemID.c_str(), &iter->Data);
 				hClientItems[i] = iter->hClient;
 				vValues[i] = iter->Data;
 				Errors[i] = S_OK;

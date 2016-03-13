@@ -70,7 +70,7 @@ HRESULT __stdcall DataCallbackSink::OnDataChange(
 	{
 		if (v.vt == VT_R8)
 		{
-			cout << v.dblVal << "  ,  ";
+			cout << v.dblVal << "\t";
 		}
 	});
 	cout << endl;
