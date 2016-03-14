@@ -233,7 +233,7 @@ public:
 		while (m_dwRef>=0)
 		{
 			if (m_OPCItems.size() <= 0) continue;
-			Sleep(200);
+			Sleep(60);
 			if (m_OPCItems.size() <= 0) continue;
 			Lock();
 			auto iter = m_OPCItems.begin();
