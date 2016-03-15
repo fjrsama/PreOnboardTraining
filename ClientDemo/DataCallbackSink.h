@@ -1,15 +1,21 @@
-#pragma once
+#ifndef DATACALLBACKSINK_H
+#define DATACALLBACKSINK_H
+
 #include "..\Server\Server_i.h"
 #include <atlbase.h>
 #include <atlcom.h>
+#include <list>
 
 using namespace ATL;
 
+class ClientDemoDlg;
 class  DataCallbackSink :public IOPCDataCallback
 
 {
 private:
 	ULONG m_cRef;
+	std::list<double> *m_wave;
+	CWnd * pWnd;
 public:
 	//IUnknown
 	STDMETHOD(QueryInterface)(REFIID riid, _COM_Outptr_ void __RPC_FAR *__RPC_FAR *ppvObject);
@@ -57,7 +63,8 @@ public:
 		/* [in] */ OPCHANDLE hGroup);
 
 
-	DataCallbackSink();
+	DataCallbackSink(std::list<double> wave[3],CWnd *p);
 	~DataCallbackSink();
 };
 
+#endif

@@ -9,7 +9,7 @@
 using namespace ATL;
 using namespace std::chrono;
 using namespace std;
-
+  
 
 // CSignal
 
@@ -50,7 +50,7 @@ private:
 
 	// ISignal Methods
 public:
-	STDMETHOD(GetCurrentValue)(LPWSTR szSigID, VARIANT * pvtData)
+	STDMETHOD(GetCurrentValue)(LPCWSTR szSigID, VARIANT * pvtData)
 	{
 		// 在此处添加函数实现。
 		static const double T1 = 2.0;

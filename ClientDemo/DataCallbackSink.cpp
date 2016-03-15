@@ -1,11 +1,13 @@
 #include "stdafx.h"
 #include "DataCallbackSink.h"
-#include <iostream>
+
 using namespace std;
 
 
-DataCallbackSink::DataCallbackSink()
+DataCallbackSink::DataCallbackSink(std::list<double> wave[3],CWnd *p)
 {
+	m_wave = wave;
+	pWnd = p;
 }
 
 
@@ -64,7 +66,11 @@ HRESULT __stdcall DataCallbackSink::OnDataChange(
 	/* [size_is][in] */ FILETIME *pftTimeStamps,
 	/* [size_is][in] */ HRESULT *pErrors)
 {
-	MessageBox(0,L"123",0,0);
+	for (int i = 0; i < dwCount; ++i)
+	{
+		m_wave[i].push_back(pvValues[i].dblVal);
+		::SendMessage(pWnd->m_hWnd, WM_PAINT, 0, 0);
+	}
 	return S_OK;
 }
 

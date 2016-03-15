@@ -15,7 +15,7 @@ import "ocidl.idl";
 interface ISignal : IUnknown 
 {
 	HRESULT GetCurrentValue(
-		[in] LPWSTR szSigID,
+		[in] LPCWSTR szSigID,
 		[out] VARIANT* pvtData
 		);
 };
