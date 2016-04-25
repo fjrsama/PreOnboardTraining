@@ -135,9 +135,9 @@ BOOL CClientDemoDlg::OnInitDialog()
 		m_iZeroPoint[ID_ItemY2] = m_DrawRect[ID_ItemY2].bottom / 2;
 		m_iZeroPoint[ID_ItemY3] = m_DrawRect[ID_ItemY3].bottom / 2;
 
-		y_k[ID_ItemY1] = 1;
-		y_k[ID_ItemY2] = 1;
-		y_k[ID_ItemY3] = 1;
+		y_k[ID_ItemY1] = 0.6;
+		y_k[ID_ItemY2] = 0.6;
+		y_k[ID_ItemY3] = 0.6;
 		x_k[ID_ItemY1] = 5;
 		x_k[ID_ItemY2] = 5;
 		x_k[ID_ItemY3] = 5;
